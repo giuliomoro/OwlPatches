@@ -104,7 +104,7 @@ public:
 		  y2pp = (y2pp - 1 + 8) & 7;
 		  y2p[y2pp] = y2[idx];
 		  y4xp[y4xpp] = nonLinear(y2[idx]); //applies the waveshaper
-		  y4xp[y4xpp] = y2[idx];
+		  //y4xp[y4xpp] = y2[idx];
 		  float y4x = Bd[0] * y4xp[y4xpp] + Bd[1] * y4xp[(y4xpp + 1) & 7] + Bd[2] * y4xp[(y4xpp + 2) & 7]
 			  + Bd[3] * y4xp[(y4xpp + 3) & 7];
 		  y4xpp = (y4xpp - 1 + 8) & 7;
