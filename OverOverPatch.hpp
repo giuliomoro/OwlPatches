@@ -36,14 +36,13 @@ private:
   ToneFilter tf;
   float* buf[2];
 public:
-  OverOverPatch(){
+  OverOverPatch(): tf(getSampleRate()){
     registerParameter(PARAMETER_A, "Drive");
     registerParameter(PARAMETER_B, "Offset");
     registerParameter(PARAMETER_C, "Tone");
     registerParameter(PARAMETER_D, "Level");
     registerParameter(PARAMETER_E, "DrivePedal");
     os=OversampledOverdrive();
-    tf=ToneFilter(getSampleRate());
   }
   void processAudio(AudioBuffer &buffer){
     static float drive_=0;
