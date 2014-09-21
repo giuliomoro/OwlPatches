@@ -70,7 +70,7 @@ Oversample::~Oversample(){}
 		  // else
 			  // xB = 0;
 		  float xTemp = (Au[0] * xu[xup] + Au[1] * xu[(xup + 1) & 3] + //output of the upsampling filter
-			  Au[2] * xu[(xup + 2) & 3] + Au[3] * xu[(xup + 3) & 3]) + xB;
+			  Au[2] * xu[(xup + 2) & 3]) + xB;
 		  xup = (xup - 1 + 4) & 3;
 		  xu[xup] = xTemp;
 		  yu[yup] = oversampledFunction(xTemp); //applies the waveshaper or whatever
@@ -79,7 +79,7 @@ Oversample::~Oversample(){}
 			  + Bd[3] * yu[(yup + 3) & 3];
 		  yup = (yup - 1 + 4) & 3;
 		  yTemp = (Ad[0] * yd[ydp] + Ad[1] * yd[(ydp + 1) & 3] + //output of the downsampling filter
-			  Ad[2] * yd[(ydp + 2) & 3] + Ad[3] * yd[(ydp + 3) & 3]) + ydB;
+			  Ad[2] * yd[(ydp + 2) & 3]) + ydB;
 		  ydp = (ydp - 1 + 4) & 3;
 		  yd[ydp] = yTemp;
 	  }
