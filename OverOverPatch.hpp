@@ -62,7 +62,8 @@ public:
     drive *= 40.f;
     level*= .5f;
     int size = buffer.getSize();
-    for (int ch = 0; ch<2; ch++) { //get pointers to the buffers
+    float numCh=1; //Use only one channel until oversampling becomes less expensive. Should instead be numCh=buffer.getChannels();numCh= numCh<=2 ? numCh : 2; 
+    for (int ch = 0; ch<numCh; ch++) { //get pointers to the buffers. 
       buf[ch] = buffer.getSamples(ch);
     }
     tf.setTone(tone_);
@@ -71,12 +72,13 @@ public:
       offset_=offset*0.001f + offset_*0.999f; //parameter smoothing
       tone_=tone*0.001f + tone_*0.999f; //parameter smoothing
       level_=level*0.001f + level_*0.999f; //parameter smoothing
-      input=(buf[0][i]+buf[1][i])*0.5f; //average the inputs
-      input = (input + offset_)*drive_;
-      output = os.processSample(input);
-      output=tf.processSample(output,0);
-      buf[0][i] = level_*output;
-      buf[1][i] = level_*output;
+      for(int ch=0;ch<numCh; ch++) {
+        input=buf[ch][i]; //average the inputs
+        input = (input + offset_)*drive_;
+        output = os.processSample(input);
+        output=tf.processSample(output,0);
+        buf[ch][i] = level_*output;
+      }
     }
   }
   //~ #include "dri50.h"

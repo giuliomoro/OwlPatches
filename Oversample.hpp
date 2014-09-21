@@ -65,10 +65,10 @@ Oversample::~Oversample(){}
 	  for (int m = 0; m<OS_L; m++) {
       //oversampling
       //the oversampling filter requires at most one multiplication for the inputs, as the input is something like [x 0 0 0], so here we save a few multiplies
-		  if (m + 1 <= OS_FL)
+		  // if (m + 1 <= OS_FL) //this check is not needed as long as the length of the filter is the same as the oversampling factor
 			  xB = x*Bu[m];
-		  else
-			  xB = 0;
+		  // else
+			  // xB = 0;
 		  float xTemp = (Au[0] * xu[xup] + Au[1] * xu[(xup + 1) & 3] + //output of the upsampling filter
 			  Au[2] * xu[(xup + 2) & 3] + Au[3] * xu[(xup + 3) & 3]) + xB;
 		  xup = (xup - 1 + 4) & 3;
