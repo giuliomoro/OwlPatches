@@ -26,6 +26,7 @@
 /*
 This patch does not do anything, only upsamples and downsamples the input signal. Used for computational cost measurements.
 It can be used as a very expensive buffer if you want to plug your headphones into your passive electric guitar :D 
+Parameter_A toggles between oversampled(when >0.5) and non-oversampled(when<0.5) 
 */
 
 #ifndef __OversamplePatch_hpp__
@@ -39,15 +40,18 @@ private:
   float* buf[2];
 public:
   OversamplePatch(){
+    registerParameter(PARAMETER_A, "Toggle oversample");
   }
   void processAudio(AudioBuffer &buffer){
     int size = buffer.getSize();
     for (int ch = 0; ch<1; ch++) {//get the pointers to the buffers
       buf[ch] = buffer.getSamples(ch);
     }
-    for (int i = 0; i < size; i++) { //process each sample
-      for (int ch = 0; ch<1; ch++) { //for each channel
-        buf[ch][i] = os.processSample(buf[ch][i]);
+    if(getParameterValue(PARAMETER_A)>0.5) { //only oversample if the knob is >0.5
+      for (int i = 0; i < size; i++) { //process each sample
+        for (int ch = 0; ch<1; ch++) { //for each channel
+          buf[ch][i] = os.processSample(buf[ch][i]);
+        }
       }
     }
   }
