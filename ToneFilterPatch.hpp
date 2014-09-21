@@ -34,30 +34,27 @@ class ToneFilterPatch : public Patch {
 private:
   ToneFilter tf;
 public:
-  ToneFilterPatch(){
+  ToneFilterPatch() : tf(getSampleRate()) { 
     registerParameter(PARAMETER_A, "Tone");
     registerParameter(PARAMETER_B, "Gain");
-    registerParameter(PARAMETER_C, "Method");
     registerParameter(PARAMETER_E, "Tone");
-    float fs=getSampleRate();
-    tf=ToneFilter(fs);
   }
   void processAudio(AudioBuffer &buffer){
-    static float tone_=0;
     static float gain_=0;
-    static float* buf[2];
+    float* buf[2];
     float expr = 1 - getParameterValue(PARAMETER_E);
     float tone = getParameterValue(PARAMETER_A)*expr;
     float gain = getParameterValue(PARAMETER_B);
-    bool tone1= getParameterValue(PARAMETER_C)<0.5;
     int size = buffer.getSize();
-    for (int ch = 0; ch<2; ch++) {//get the pointers to the buffers
+    int numCh = buffer.getChannels();
+    numCh = numCh<=2 ? numCh : 2; //we only allocated two pointers to buffer, so in the case that we have more, ignore the others.
+    for (int ch = 0; ch<numCh; ch++) {//get the pointers to the buffers
       buf[ch] = buffer.getSamples(ch);
     }
-    tf.setTone(tone); // placing this here instead of doing it for every sample roughly saves 400 operations per sample, with no audible clicks in the output.
+    tf.setTone(tone); // placing this here instead of doing it for every sample roughly saves 200 OPS per channel, with no audible clicks in the output.
     for (int i = 0; i < size; i++) {                  //process each sample
       gain_=gain*0.001 + gain_*0.999; //parameter smoothing
-      for (int ch = 0; ch<2; ch++) {     //for each channel
+      for (int ch = 0; ch<numCh; ch++) {     //for each channel
         buf[ch][i] = gain_*tf.processSample(buf[ch][i], ch);
       }
     }
