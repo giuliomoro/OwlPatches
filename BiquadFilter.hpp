@@ -73,7 +73,7 @@ private:
   BiquadFilter downfilter;
   float* oversampled;
 public:
-  Oversampler(int blocksize) : upfilter(1), downfilter(1) {
+  Oversampler(int blocksize) : upfilter(2), downfilter(2) {
     /*  
      * Convert series second-order sections to direct form
      * [b,a] = ellip(4, 2, 70, 19200/(48000*4/2))
