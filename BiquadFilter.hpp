@@ -63,43 +63,39 @@ public:
 };
 
 /**
-   Implements 4x oversampling
+   Implements BF_OS_Lx oversampling
 */
+#define BF_OS_L 4
+#define LOG2_BF_OS_L 2 //please change this value according to BF_OS_L
 class Oversampler {
 private:
   BiquadFilter upfilter;
   BiquadFilter downfilter;
   float* oversampled;
 public:
-  Oversampler(int blocksize) : upfilter(2), downfilter(2) {
-    /*   [b,a] = ellip(2, 2, 70, 19200/(48000*4/2)) */
-//     static float coeffs[] = { 5.14483600142e-02, 1.01958385114e-01, 5.14483600142e-02, -1.35468949025e+00, 6.12586787851e-01 };
-    /* Convert series second-order sections to direct form
-     * output_precision(6)
+  Oversampler(int blocksize) : upfilter(1), downfilter(1) {
+    /*  
+     * Convert series second-order sections to direct form
      * [b,a] = ellip(4, 2, 70, 19200/(48000*4/2))
-     * [sos,g] = tf2sos(b,a)
+     * sos = tf2sos(b,a)
      * b0          b1          b2          a0         a1           a2
      * 1.0000000   1.4157500   1.0000000   1.0000000  -1.5499654   0.8890431  first biquad
      * 1.0000000   0.0467135   1.0000000   1.0000000  -1.6359692   0.7189533  second biquad
-     */
-    #define GAIN 0.0176674622723146
+     *
+     * The signs of the a1 and a2 coefficient need to be changed and the a0 coefficient is omitted (must be a0==1) so that the coefficients array contains 
+     * {B(0),B(1),B(2),-A(1),-A(2),...}.
+     * As the amplitude is multiplied by 1/BF_OS_L when upsampling, you will want to compensate for this loss somewhere.*/
     static float coeffs[10] = { 
-        /* If you compute the filter coefficients for one of the filters as e.g. [B A]=ellip(2,2,80,19200/(48000*4/2)) ,
-        in the coeffs array you need to put the values {B(0),B(1),B(2),-A(1),-A(2)}.
-        As the amplitude is multiplied by 1/4 when upsampling, you will want to compensate for this loss somewhere.
-        Either in the filter coefficients (will require different coefficients for upsampling and downsampling), or in the upsample routine (see below)
+        /*Either in the filter coefficients (will require different coefficients for upsampling and downsampling), or in the upsample routine (see below)
         Coefficients below were computed in GNU Octave using
-        [b,a] = ellip(4, 3, 40, 19200/(48000*4/2)); sos = tf2sos(b,a) */
+        [b,a] = ellip(4, 2, 70, 19200/(48000*4/2)); [sos] = tf2sos(b,a)*/
         0.00319706223776298,   0.00452624091396112,   0.00319706223776297, 1.54996539093296581, -0.88904312844649880,
         1.00000000000000000 ,  0.04671345292281195,   1.00000000000000222, 1.63596919736817048, -0.71895330675421443
-
-          // 1.76674622723146e-02,  -9.17279233954755e-04,   1.76674622723145e-02,  1.58391500480444e+00   -9.32046186768266e-01
-          // 1.00000000000000e+00,  -1.29724486401753e+00,   1.00000000000000e+00,  1.65074162038260e+00   -7.48880762739908e-01
     };
     upfilter.setCoefficents(coeffs);
     // two filters: same coefficients, different state variables
     downfilter.setCoefficents(coeffs);
-    oversampled = (float*)malloc(blocksize*4*sizeof(float));
+    oversampled = (float*)malloc(blocksize*BF_OS_L*sizeof(float));
   }
   ~Oversampler(){
     free(oversampled);
@@ -107,22 +103,22 @@ public:
   float* upsample(float* buf, int sz){
     float* p = oversampled;
     for(int i=0; i<sz; ++i){
-      *p++ = buf[i]*4;  /*this *4 compensates for the gain loss due to the zero-stuffing. It turns out that this multiply 
+      *p++ = buf[i]*BF_OS_L;  /*this *BF_OS_L compensates for the gain loss due to the zero-stuffing. It turns out that this multiply 
                         does not add to the computational cost, so it is easier to do this rather than 
                         using different filter coefficients for up/down sampling*/
-      *p++ = 0;
-      *p++ = 0;
-      *p++ = 0;
+      for(int i=BF_OS_L-1;i>0;i--){ //set the remaining samples of the oversampled buffer to 0 (zero-stuffing). The for variable i is decreased, hoping this will lead to better compiler optimization
+        *p++ = 0;
+      }
     }
-    upfilter.process(oversampled, sz<<2);
+    upfilter.process(oversampled, sz<<LOG2_BF_OS_L);
     return oversampled;
   }
   float* downsample(float* buf, int sz){
-    downfilter.process(oversampled, sz<<2);
+    downfilter.process(oversampled, sz<<LOG2_BF_OS_L);
     float* p = oversampled;
     for(int i=0; i<sz; ++i){
       buf[i] = *p;
-      p += 4;
+      p += BF_OS_L;
     }
     return buf;
   }
