@@ -17,9 +17,10 @@ REGISTER_PATCH(FreeVerbPatch, "FreeVerb", 1, 1);
 REGISTER_PATCH(GainPatch, "Gain", 2, 2);
 REGISTER_PATCH(ParametricEqPatch, "Parametric EQ", 1, 1);
 */
-REGISTER_PATCH(OverOverPatch, "Oversampled Overdrive", 2, 2);
-REGISTER_PATCH(OversamplePatch, "Oversample bypass", 2, 2);
-REGISTER_PATCH(ToneFilterPatch, "Tone Filter", 2, 2);
+REGISTER_PATCH(OversamplerPatch, "Oversample bypass block", 2, 2);
+// REGISTER_PATCH(OversamplePatch, "Oversample bypass sample", 2, 2);
+// REGISTER_PATCH(OverOverPatch, "Oversampled Overdrive", 2, 2);
+// REGISTER_PATCH(ToneFilterPatch, "Tone Filter", 2, 2);
 // REGISTER_PATCH(WaveshaperPatch, "Waveshaper", 2, 2);
 //~ REGISTER_PATCH(OverdrivePatch, "Overdrive", 2, 2);
 //~ REGISTER_PATCH(CompressorPatch, "Compressor", 1, 1);

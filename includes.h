@@ -4,12 +4,13 @@
 
 /*#include "GainPatch.hpp"
 #include "ParametricEqPatch.hpp"*/
-#include "ToneFilterPatch.hpp"
-#include "OversamplePatch.hpp"
+// #include "ToneFilterPatch.hpp"
+// #include "OversamplePatch.hpp"
+#include "OversamplerPatch.hpp"
 // #include "WaveshaperPatch.hpp"
 //~ #include "CompressorPatch.hpp"
 //~ #include "PlateVerbPatch.hpp"
-#include "OverOverPatch.hpp"
+// #include "OverOverPatch.hpp"
 //~ #include "SimpleDelayPatch.hpp"
 //~ #include "PhaserPatch.hpp"
 /*#include "Contest/BiasedDelayPatch.hpp" 
