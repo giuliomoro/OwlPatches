@@ -107,7 +107,7 @@ public:
                         does not add to the computational cost, so it is easier to do this rather than 
                         using different filter coefficients for up/down sampling*/
       for(int i=BF_OS_L-1;i>0;i--){ //set the remaining samples of the oversampled buffer to 0 (zero-stuffing). The for variable i is decreased, hoping this will lead to better compiler optimization
-        *p++ = 0;
+        *p++ = 0; //unwrapping the loop has no improvement in the performances when BF_OS_L==4, this means that it is unwrapped by the compiler!! (phew)
       }
     }
     upfilter.process(oversampled, sz<<LOG2_BF_OS_L);
